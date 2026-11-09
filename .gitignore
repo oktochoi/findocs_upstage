@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+node_modules/
+__pycache__/
+.venv/
+.next/
+dist/
+
+# 데이터셋 PDF·zip은 iM뱅크 서식이라 저장소에 올리지 않는다
+제출물/데이터셋/
+제출물/*.zip

@@ -1,0 +1,1837 @@
+{
+  "kind": "studio.workflow-config-draft",
+  "schemaVersion": 4,
+  "exportedAt": "2026-11-09T17:46:18.834Z",
+  "exportedFrom": {
+    "workflowId": "agt_W3as97vypBftFEUVUbbHhu",
+    "workflowName": "슬기짜기2_최종제출_민감정보 위험도 판정",
+    "configId": "cfg_egparfkT4ZBETzU7pXfVyx",
+    "configVer": 5
+  },
+  "workflowConfig": {
+    "workflow_name": "슬기짜기2_최종제출_민감정보 위험도 판정",
+    "pipelineType": "instruct",
+    "documentParseConfiguration": {
+      "modelName": "document-parse",
+      "mode": "standard",
+      "ocrMode": "force",
+      "lang": "",
+      "chartRecognition": false,
+      "coordinates": true,
+      "mergeMultipageTables": false,
+      "outputFormats": [
+        "html",
+        "text"
+      ],
+      "base64Encoding": [
+        "figure"
+      ],
+      "customName": "파싱"
+    },
+    "informationExtractConfiguration": {
+      "modelName": "",
+      "schemas": [
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "민감항목_추출",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "page": {
+                        "type": "integer",
+                        "description": "값이 있는 쪽 번호. 첫 쪽이 1."
+                      },
+                      "document": {
+                        "type": "string",
+                        "description": "값이 있는 서류의 제목(예: 자동이체 신청서, 주민등록증 사본). 한 PDF에 서류가 여럿이면 서류마다 다르게 적는다."
+                      },
+                      "field_label": {
+                        "type": "string",
+                        "description": "값이 적힌 칸의 이름. 칸 이름이 없으면 가장 가까운 제목."
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "값 원문. 칸에 적힌 글자를 자르지 않고 모두 옮긴다. 고른 선택지는 그 문구. 가려진 칸은 보이는 글자만."
+                      },
+                      "owner_name": {
+                        "type": "string",
+                        "description": "값의 주인 이름(사람 이름이나 상호). 알 수 없으면 빈 값."
+                      },
+                      "owner_type": {
+                        "type": "string",
+                        "description": "사람, 사업체 중 하나만 적는다. 기준은 [주인]."
+                      },
+                      "nature": {
+                        "type": "string",
+                        "description": "사실 또는 선택 중 하나만 적는다. 사실은 그 사람이 누구인지, 어떤 상태인지, 무엇을 가졌고 어떤 거래를 했는지 알려 주는 값. 선택은 이번 신청을 어떻게 처리할지 고른 조건(상품·서비스·부가기능 이름, 수령·통지 방법, 동의 여부, 작성·신청 날짜, 위임 내용·신청 업무처럼 은행에 맡기거나 신청하는 일의 내용)뿐이다. 고른 선택지라도 신청 사유처럼 그 사람의 건강·재산·소득·가족·직업 같은 사정을 알려 주면 사실이고, 그 내용에 맞는 태그를 붙인다."
+                      },
+                      "tag": {
+                        "type": "string",
+                        "description": "[태그 정의]의 태그 이름 하나를 그대로 적는다: 주민등록번호, 외국인등록번호, 여권번호, 운전면허번호, 국내거소신고번호, 건강, 사상·신념, 노동조합·정당, 정치적 견해, 성생활, 유전정보, 범죄경력, 생체특징정보, 인종·민족, 비밀번호, 인증서, 이용자번호, 카드보안코드, 계좌번호, 카드번호, 거래내용, 신용도, 신용거래능력, 기타 신용판단정보, 성명, 생년월일, 성별, 전화번호, 주소, 이메일, 직업·직장, 학력, 혼인 여부, 가족관계, 신체정보, 취미, 그 밖의 개인정보. 사업체 값도 내용에 맞는 태그를 적는다."
+                      },
+                      "exposure": {
+                        "type": "string",
+                        "description": "전부 보임, 기호로 일부 가림 중 하나만 적는다. 기준은 [노출]."
+                      }
+                    }
+                  },
+                  "description": "고객과 그 고객의 사업체에 관한 값. 값 하나가 한 행이다. 기준은 공통 지시의 [대상]~[노출]."
+                },
+                "obscured": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "page": {
+                        "type": "integer",
+                        "description": "가려진 칸이 있는 쪽 번호. 첫 쪽이 1."
+                      },
+                      "field_label": {
+                        "type": "string",
+                        "description": "가려진 칸의 이름."
+                      },
+                      "visible_text": {
+                        "type": "string",
+                        "description": "그 칸에서 보이는 글자. 없으면 빈 값."
+                      },
+                      "hidden_length": {
+                        "type": "integer",
+                        "description": "가려진 글자 수 어림. 모르면 0."
+                      },
+                      "candidate_tags": {
+                        "type": "string",
+                        "description": "그 칸의 값이 될 수 있는 태그를 [태그 정의]의 이름으로 쉼표로 이어 적는다: 칸 이름이 가리키는 태그, 보이는 글자에 가려진 길이를 더한 번호의 태그(13자리면 주민등록번호, 15~16자리면 카드번호), 가려진 선택지의 내용이 가리키는 태그. 생년월일·주민등록번호 앞자리 칸에서 앞 6자리 뒤가 가려졌으면 주민등록번호를 후보에 넣는다."
+                      }
+                    }
+                  },
+                  "description": "흐림·얼룩·덧칠 등으로 글자가 일부라도 보이지 않는 칸. 칸 하나가 한 행이다. 기준은 공통 지시의 [가림]. 없으면 빈 표."
+                }
+              }
+            }
+          },
+          "mode": "enhanced",
+          "modelName": "",
+          "schemaLayout": {
+            "version": 1,
+            "columns": [
+              {
+                "name": "page",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "document",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "field_label",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "value",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "owner_name",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "owner_type",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "nature",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "tag",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "exposure",
+                "source": "group_table",
+                "groupTableKey": "values"
+              },
+              {
+                "name": "page",
+                "source": "group_table",
+                "groupTableKey": "obscured"
+              },
+              {
+                "name": "field_label",
+                "source": "group_table",
+                "groupTableKey": "obscured"
+              },
+              {
+                "name": "visible_text",
+                "source": "group_table",
+                "groupTableKey": "obscured"
+              },
+              {
+                "name": "hidden_length",
+                "source": "group_table",
+                "groupTableKey": "obscured"
+              },
+              {
+                "name": "candidate_tags",
+                "source": "group_table",
+                "groupTableKey": "obscured"
+              }
+            ]
+          },
+          "userSystemPrompt": "[역할] 너는 은행에 낸 서식·서류 PDF에서 고객 개인정보 값을 빠짐없이 찾아 표로 옮기는 추출 담당자다.\n[목표] 서류를 외부로 보내기 전에 점검한다. 사람에 관한 값이 어느 쪽 어느 칸에 얼마나 드러나 있는지 values 표에 적고, 얼룩 등으로 읽을 수 없는 칸은 obscured 표에 적는다. 등급은 정하지 않는다.\n[대상] 고객(신청인·예금주·가입자·대리인·가족·받는 사람 등)과 그 고객의 사업체에 관한 값을 모두 values 표에 한 행씩 적는다. 손으로 쓴 값, 타자로 친 값, 고른 선택지, 은행·기관이 그 고객에 대해 인쇄한 값(전산 인자, 증명서, 거래내역), 함께 스캔된 첨부 서류(신분증 사본 등)의 값이 모두 대상이다. 어느 태그에 맞는지 애매한 값도 빠뜨리지 않고 적는다.\n[선택지] Parse 글자의 ☑는 고른 선택지, □는 고르지 않은 선택지다. 고른 선택지만 값으로 적고, 고르지 않은 선택지의 문구는 적지 않는다.\n[값이 아닌 것] 칸 이름, 안내문, 서식에 인쇄된 작성 예시, 약관·설명서·동의서 본문(가입 대상, 우대 요건, 상품 설명처럼 서식에 미리 인쇄된 문구), 빈칸, 서명란·도장 안의 글자, 은행·지점 정보(은행명, 지점명, 대표번호, 지점 주소, 서식 번호, 바코드), 은행 직원이 확인·결재하는 칸의 값은 적지 않는다. 값 자리에 칸 이름을 되풀이한 글자나 안내 문구(예: 본인명의 입출금계좌)만 있으면 빈칸이다. 그림 표시(![image] 같은 것)는 값이 아니다. 계좌번호·카드번호·고유식별번호 태그는 숫자가 적힌 값에만 붙인다.\n[같은 값] 같은 값이 여러 번 나오면 처음 나온 쪽의 한 행만 적는다.\n[주인] owner_type은 사람 또는 사업체다. 사업체는 법인·개인사업자의 값(상호, 사업자등록번호, 법인등록번호, 사업장 주소·전화, 회사 도메인 이메일, 사업체 명의 계좌). 사업체 칸에 적혀 있어도 한 사람이 쓰는 값(그 사람의 휴대폰 번호, 개인 이메일)은 사람이다. 생년월일(사업자번호)처럼 사람·사업체가 함께 쓰는 칸의 번호는 같은 신청인 칸의 이름이 주식회사·(주)·법인처럼 법인 이름이면 사업체다. 사업체라는 근거가 없으면 사람으로 적는다.\n[노출] exposure는 전부 보임, 기호로 일부 가림 중 하나다. 값의 일부가 *, X, ●, # 같은 기호로 인쇄되거나 적혀 있으면 기호로 일부 가림이다. 얼룩·번짐·덧칠로 가려진 것은 기호 가림이 아니며 obscured 표에 적는다.\n[가림] 값을 추측해서 채우지 않는다. 문서 이미지에서 값을 쓰는 칸과 체크 칸을 하나씩 보고, 흐림·얼룩·덧칠·지운 자국·접힘·찢김으로 글자나 체크 표시가 일부라도 보이지 않는 칸을 obscured 표에 한 행씩 적는다. 덮인 아래에 값이 있었는지 몰라도 적는다. 도장·서명이 겹쳐도 글자를 읽을 수 있거나, 서명란·도장 자리만 덮였으면 적지 않는다. 가려진 칸은 values에 보이는 글자만 적고, 보이는 글자가 없거나 값 자리가 얼룩·그림으로만 보이면 values에 적지 않는다.\n[태그 정의] 태그는 아래 이름 중 하나를 그대로 적는다. 묶음 이름 뒤 괄호는 근거다.\n고유식별정보(개인정보 보호법 제24조·제24조의2, 시행령 제19조, 신용정보법 시행령 제2조제2항):\n- 주민등록번호: 가운데 줄표 앞 6자리와 뒤 7자리 번호. 칸 이름이 생년월일이어도 이 꼴이면 주민등록번호다. 뒷자리가 6자리나 8자리처럼 하나 모자라거나 남아도 주민등록번호로 적는다. 숫자 6자리만 있으면 생년월일이다. 뒤 7자리 첫 숫자가 0이면 법인등록번호이고 주인 종류는 사업체다\n- 외국인등록번호\n- 여권번호: 영문 1~2자와 숫자 7~8자리로 된 번호. 실명번호 칸에 적힌 외국인의 여권번호도 여권번호다\n- 운전면허번호\n- 국내거소신고번호\n민감정보(개인정보 보호법 제23조, 시행령 제18조):\n- 건강: 건강·질병·장애·진료·투약·요양·입원·수술·의료비\n- 사상·신념\n- 노동조합·정당: 노동조합·정당의 가입·탈퇴\n- 정치적 견해\n- 성생활\n- 유전정보\n- 범죄경력\n- 생체특징정보: 개인을 알아보려고 기술적으로 만든 신체·생리·행동 특징 정보\n- 인종·민족\n접근매체(전자금융거래법 제2조제10호·제6조제3항, 개인정보의 안전성 확보조치 기준 제7조, PCI DSS v4.0 3.3.1):\n- 비밀번호: 비밀번호, PIN\n- 인증서: 인증서, 전자서명생성정보\n- 이용자번호: 금융회사 인터넷뱅킹·모바일뱅킹 로그인 아이디와 금융회사에 등록된 이용자번호만. 항공·포인트·쇼핑 회원번호와 아이디는 그 밖의 개인정보\n- 카드보안코드: 카드 CVC\n금융거래 식별번호(금융실명법 제4조, PCI DSS v4.0 3.4.1):\n- 계좌번호\n- 카드번호: 신용·체크카드 번호와 유효기간\n신용정보(신용정보법 제2조제1호의3~제1호의6, 제2조제2호):\n- 거래내용: 대출·보증·카드·보험·예금 거래의 종류·기간·금액·금리·한도, 이체·출금 금액, 잔액, 보험금\n- 신용도: 그 사람이 한 연체·대위변제·부도, 명의도용·사기 같은 행위. 사기·명의도용을 당한 피해 사실은 신용도가 아니고 그 밖의 개인정보\n- 신용거래능력: 재산, 채무, 소득, 납세실적\n- 기타 신용판단정보: 회생·파산·면책·채무조정, 세금·공과금 체납, 신용평점, 법원 판결·행정처분\n개인식별정보(개인정보 보호법 제2조제1호, 개인정보 영향평가 수행안내서 등급표 2등급):\n- 성명\n- 생년월일: 생년월일, 나이\n- 성별\n- 전화번호\n- 주소\n- 이메일\n개인관련정보(개인정보 보호법 제2조제1호, 개인정보 영향평가 수행안내서 등급표 2등급):\n- 직업·직장: 직장명, 부서, 직위, 입사일, 직업\n- 학력\n- 혼인 여부\n- 가족관계\n- 신체정보: 키, 몸무게 등\n- 취미\n- 그 밖의 개인정보: 위 태그에 없는, 그 사람에 관한 사실"
+        }
+      ],
+      "categorySchemaMapping": {}
+    },
+    "instructConfiguration": {
+      "nodes": [
+        {
+          "name": "부류_정리",
+          "modelName": "",
+          "prompt": "[역할] 너는 앞 단계 민감항목_추출의 values 표를 부류 목록으로 옮겨 적는 담당자다.\n[목표] 뒤의 Validate 노드들이 이 목록에 규칙표를 적용해 위험 등급과 검토 필요를 정한다. 여기서는 등급과 검토 필요를 정하지 않고, 규칙이 읽을 줄만 정확히 쓴다.\n[입력] values 표와 obscured 표. 문서 원문 글자는 다시 읽지 않고, 태그는 values의 tag를 그대로 쓴다.\n[과정]\n1. 세는 행은 owner_type이 사람이고 nature가 사실인 행이다. 사업체 행과 선택 행은 세지 않는다. values 표의 행을 위에서부터 하나도 빠뜨리지 않고 번호를 붙여 rows 줄에 적고, 행마다 셈 또는 안 셈을 적는다. 앞뒤 행이 안 셈이어도 그 행의 owner_type과 nature만 보고 정한다.\n2. exposure가 기호로 일부 가림인 세는 행은 [가린 값]에 따라 태그를 바꾸고 masked_rows 줄에 적는다. 바꾸기 전의 원래 태그는 class 줄에 쓰지 않는다.\n3. rows에서 셈인 행의 태그(2에서 바꾼 태그 포함)를 [부류]에 따라 class_E~class_B 줄에 나눈다. 셈인 행의 태그는 모두 어느 한 class 줄에 들어가야 한다. 같은 태그는 한 번만 적고, 태그끼리는 쉼표와 한 칸 띄어쓰기(\", \")로만 잇는다. class 줄에는 values 표의 tag 값만 쓰고 field_label(칸 이름)의 낱말을 태그로 쓰지 않는다.\n4. tag가 주민등록번호·외국인등록번호·카드번호인 세는 행(기호로 가린 값은 뺌)마다 digit_count 줄에 값의 숫자를 한 글자씩 띄어 쓰고 개수를 센다. 주민등록번호·외국인등록번호는 13개, 카드번호는 15개 또는 16개가 아니면 format_check 줄에 그 칸 이름과 개수를 적는다. 여권번호·운전면허번호·계좌번호는 세지 않는다.\n5. owner_type이 사업체이고 tag가 계좌번호인 행이 있으면 business_account를 있음으로 적는다.\n\n[부류] 태그마다 부류가 정해져 있다.\n- E 단독 고위험: 주민등록번호, 외국인등록번호, 여권번호, 운전면허번호, 국내거소신고번호, 비밀번호, 인증서, 이용자번호, 카드보안코드, 카드번호 (개인정보 보호법 제24조·제24조의2, 전자금융거래법 제2조제10호, 금융분야 개인신용정보보호 가이드라인(카드번호 단독), PCI DSS 3.3.1)\n- F 계좌번호: 계좌번호 (개인정보 영향평가 등급표 1등급(금융정보), 금융실명법 시행령 제6조)\n- C 민감정보: 건강, 사상·신념, 노동조합·정당, 정치적 견해, 성생활, 유전정보, 범죄경력, 생체특징정보, 인종·민족 (개인정보 보호법 제23조, 시행령 제18조)\n- D 신용 판단 정보: 거래내용, 신용도, 신용거래능력, 기타 신용판단정보 (신용정보법 제2조제1호의3~제1호의6)\n- A 식별자: 성명, 주소, 전화번호, 이메일 (금융분야 가명·익명처리 안내서(식별자))\n- B 개인식별가능정보: 생년월일, 성별, 직업·직장, 학력, 혼인 여부, 가족관계, 신체정보, 취미, 그 밖의 개인정보 (금융분야 가명·익명처리 안내서(개인식별가능정보), 개인정보 영향평가 등급표 2등급)\n- 목록에 없는 태그는 B로 본다\n[가린 값] exposure가 '기호로 일부 가림'인 행은 원래 태그로 세지 않는다. 주민등록번호·외국인등록번호·국내거소신고번호는 생년월일과 성별 두 개(B)로 세고, 카드번호는 세지 않고(PCI DSS 3.4.1 표시 기준), 그 밖의 값은 '그 밖의 개인정보'(B) 하나로 센다.\n\n[제약] 등급, 검토 필요, 규칙 번호는 쓰지 않는다. 값을 추측하지 않는다. 아래 줄 이름과 순서를 바꾸지 않고, 아래 줄 밖의 말을 덧붙이지 않는다.\n\n[출력] 아래 줄을 이 순서로 쓴다.\nrows: <values 표의 모든 행을 위에서부터 '<번호>) <page>쪽 「<field_label>」 <tag> <owner_type>·<nature>·<exposure> → 셈 또는 안 셈' 꼴로 세미콜론으로 이어 쓴다. 표가 비었으면 없음>\nmasked_rows: <기호로 일부 가림인 세는 행마다 '원래 태그 → 바꾼 태그'를 쉼표로 이어 쓴다. 없으면 없음>\nclass_E: <단독 고위험(E) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\nclass_F: <계좌번호(F) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\nclass_C: <민감정보(C) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\nclass_D: <신용 판단 정보(D) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\nclass_A: <식별자(A) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\nclass_B: <개인식별가능정보(B) 부류 태그를 \", \"로 이어 쓴다. 없으면 없음>\ndigit_count: <4번 대상 행마다 '칸 이름: 숫자를 한 글자씩 띄어 쓴 것 = 개수'를 세미콜론으로 이어 쓴다. 대상 행이 없으면 없음>\nformat_check: <4번에서 자릿수가 맞지 않은 칸 이름과 개수. 없으면 없음>\nbusiness_account: <있음 또는 없음>"
+        },
+        {
+          "name": "매우높음_확정",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 매우 높음, 검토 필요 아니오 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 매우 높음\nrule_review: 아니오\nrule_route: 등급_가르기_1 빨강(R1~R3 중 하나에 해당) → 검토_매우높음 초록\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "매우높음_검토",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 매우 높음, 검토 필요 예 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 매우 높음\nrule_review: 예\nrule_route: 등급_가르기_1 빨강(R1~R3 중 하나에 해당) → 검토_매우높음 빨강(N1·N2 중 하나에 해당)\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "높음_확정",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 높음, 검토 필요 아니오 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 높음\nrule_review: 아니오\nrule_route: 등급_가르기_1 노랑(R4·R5 중 하나에 해당) → 검토_높음 초록\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "높음_검토",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 높음, 검토 필요 예 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 높음\nrule_review: 예\nrule_route: 등급_가르기_1 노랑(R4·R5 중 하나에 해당) → 검토_높음 빨강(N1·N2 중 하나에 해당)\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "위험도_판정",
+          "modelName": "",
+          "prompt": "[역할] 너는 규칙 판정 결과를 은행 직원이 바로 고칠 수 있는 보고로 정리하는 담당자다.\n[목표] 위험 등급과 검토 필요는 앞의 Validate 규칙이 이미 정해 rule_grade·rule_review 줄로 넘겼다. 이 값을 바꾸지 않고 옮기고, 근거·위치·조치를 쓴다.\n[입력] 앞 노드 응답(rule_grade, rule_review, rule_route와 부류 줄), 민감항목_추출의 values 표와 obscured 표.\n[과정]\n1. risk_grade는 rule_grade를, needs_review는 rule_review를 글자 그대로 쓴다. 결정값도 rule_grade와 같은 값을 고른다. 표를 다시 보고 등급이나 검토 필요를 고치지 않는다.\n2. applied_rule은 [규칙]에서 risk_grade와 같은 등급의 규칙 가운데 부류 줄에 처음 맞는 규칙 번호다.\n3. sensitive_items는 class 줄에 나온 태그 전부다. 이 순서로 쓴다: 주민등록번호, 외국인등록번호, 여권번호, 운전면허번호, 국내거소신고번호, 비밀번호, 인증서, 이용자번호, 카드보안코드, 카드번호, 계좌번호, 건강, 사상·신념, 노동조합·정당, 정치적 견해, 성생활, 유전정보, 범죄경력, 생체특징정보, 인종·민족, 거래내용, 신용도, 신용거래능력, 기타 신용판단정보, 성명, 주소, 전화번호, 이메일, 생년월일, 성별, 직업·직장, 학력, 혼인 여부, 가족관계, 신체정보, 취미, 그 밖의 개인정보. 목록에 없는 태그는 맨 뒤에 쓴다.\n4. reason은 applied_rule의 조건, 그 조건을 만든 태그와 그 태그가 있는 쪽·칸(values 표), 근거 법령을 1문장으로 쓴다. business_account가 있음이면 끝에 '법인·사업체 계좌번호는 개인정보가 아니라 등급에 넣지 않음'을 붙인다.\n5. review_reason은 rule_review가 예일 때만 쓴다. 아래 순서로 원인이 된 칸을 찾아, 칸 이름과 이유, 확인 전 등급(risk_grade)을 1문장으로 쓴다. ① format_check에 적힌 칸 ② values 표에서 주민등록번호·외국인등록번호 꼴(앞 6자리-뒤)인데 뒤가 7자리가 아니거나, 카드번호 꼴(4자리씩 네 묶음)인데 15~16자리가 아닌 값의 칸(기호로 가린 값은 뺀다) ③ obscured 표에서 후보 태그 때문에 등급이 오를 수 있는 칸과 그 후보 태그.\n6. reason·review_reason·locations에는 값 원문(번호, 이름, 주소, 금액)을 쓰지 않는다. 쪽·칸 이름과 태그만 쓴다. 이 보고도 외부로 나갈 수 있는 글이기 때문이다.\n\n[부류] 태그마다 부류가 정해져 있다.\n- E 단독 고위험: 주민등록번호, 외국인등록번호, 여권번호, 운전면허번호, 국내거소신고번호, 비밀번호, 인증서, 이용자번호, 카드보안코드, 카드번호 (개인정보 보호법 제24조·제24조의2, 전자금융거래법 제2조제10호, 금융분야 개인신용정보보호 가이드라인(카드번호 단독), PCI DSS 3.3.1)\n- F 계좌번호: 계좌번호 (개인정보 영향평가 등급표 1등급(금융정보), 금융실명법 시행령 제6조)\n- C 민감정보: 건강, 사상·신념, 노동조합·정당, 정치적 견해, 성생활, 유전정보, 범죄경력, 생체특징정보, 인종·민족 (개인정보 보호법 제23조, 시행령 제18조)\n- D 신용 판단 정보: 거래내용, 신용도, 신용거래능력, 기타 신용판단정보 (신용정보법 제2조제1호의3~제1호의6)\n- A 식별자: 성명, 주소, 전화번호, 이메일 (금융분야 가명·익명처리 안내서(식별자))\n- B 개인식별가능정보: 생년월일, 성별, 직업·직장, 학력, 혼인 여부, 가족관계, 신체정보, 취미, 그 밖의 개인정보 (금융분야 가명·익명처리 안내서(개인식별가능정보), 개인정보 영향평가 등급표 2등급)\n- 목록에 없는 태그는 B로 본다\n[가린 값] exposure가 '기호로 일부 가림'인 행은 원래 태그로 세지 않는다. 주민등록번호·외국인등록번호·국내거소신고번호는 생년월일과 성별 두 개(B)로 세고, 카드번호는 세지 않고(PCI DSS 3.4.1 표시 기준), 그 밖의 값은 '그 밖의 개인정보'(B) 하나로 센다.\n[식별 가능] 세는 행 전체에 A가 하나 이상 있거나 B가 서로 다른 태그로 두 개 이상 있으면 식별 가능이다.\n[규칙] 문서의 세는 행 전체로, 위에서부터 처음 맞는 규칙 하나를 골라 등급을 정한다.\n- R1 단독 고위험(E)이 하나라도 있음 → 매우 높음 (개인정보 보호법 제24조·제24조의2, 전자금융거래법 제2조제10호, 금융분야 개인신용정보보호 가이드라인(카드번호 단독), PCI DSS 3.3.1)\n- R2 민감정보(C)가 있고 식별 가능 → 매우 높음 (개인정보 보호법 제23조, 시행령 제40조제1항제2호)\n- R3 계좌번호(F)와 신용 판단 정보(D)가 있고 식별 가능 → 매우 높음 (금융실명법 제4조·시행령 제6조(특정인의 거래정보))\n- R4 계좌번호(F)가 있음 → 높음 (개인정보 영향평가 등급표 1등급(금융정보), 금융실명법 시행령 제6조)\n- R5 신용 판단 정보(D)가 있고 식별 가능 → 높음 (신용정보법 제2조제1호가목 괄호·제2호(개인신용정보))\n- R6 식별 가능 → 보통 (개인정보 보호법 제2조제1호가목·나목)\n- R7 위에 해당 없음 → 없음 (개인정보 보호법 제2조제1호, 신용정보법 제2조제2호)\n\n[제약] rule_grade·rule_review와 다른 등급이나 검토 필요를 쓰지 않는다. 값을 추측하지 않는다. 아래 줄 이름과 순서를 바꾸지 않는다.\n\n[출력] 아래 줄을 이 순서로 쓴다.\nrule_grade: <앞 노드의 rule_grade 그대로>\nrule_review: <앞 노드의 rule_review 그대로>\nmasked_rows: <앞 노드 응답의 masked_rows 줄 그대로>\nclass_E: <앞 노드 응답의 class_E 줄 그대로>\nclass_F: <앞 노드 응답의 class_F 줄 그대로>\nclass_C: <앞 노드 응답의 class_C 줄 그대로>\nclass_D: <앞 노드 응답의 class_D 줄 그대로>\nclass_A: <앞 노드 응답의 class_A 줄 그대로>\nclass_B: <앞 노드 응답의 class_B 줄 그대로>\nbusiness_account: <앞 노드 응답의 business_account 줄 그대로>\napplied_rule: <R1~R7 중 하나>\nrisk_grade: <매우 높음, 높음, 보통, 없음 중 하나>\nneeds_review: <예 또는 아니오>\nsensitive_items: <class 줄에 나온 태그 전부를 [태그, 태그] 꼴로. 없으면 []>\nreason: <4번>\nreview_reason: <5번. rule_review가 아니오이면 콜론 뒤를 비운다>\nlocations: <앞 노드 응답의 rows에서 셈이고 태그가 class_E·F·C·D·A에 든 행마다 '<page>쪽 「<field_label>」: <tag>(<exposure>)'를 세미콜론으로 이어 쓴다. 없으면 없음>\naction: <needs_review가 예이면 '원본을 다시 스캔하거나 담당자가 원본을 보고 다시 판정'. 아니면 risk_grade에 따라 매우 높음 '외부 발송 차단. 표시한 칸을 가린 뒤 다시 점검'; 높음 '표시한 칸을 가린 뒤 발송. 가리지 않고 보내려면 관리책임자 사전 승인'; 보통 '받는 곳에 꼭 필요한 정보인지 담당자가 확인한 뒤 발송'; 없음 '발송 가능'>\n마지막 줄에 risk_grade 값만 한 번 더 쓴다.",
+          "enumEnabled": true,
+          "enumValues": [
+            "매우 높음",
+            "높음",
+            "보통",
+            "없음"
+          ]
+        },
+        {
+          "name": "보통_확정",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 보통, 검토 필요 아니오 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 보통\nrule_review: 아니오\nrule_route: 등급_가르기_1 초록 → 등급_가르기_2 빨강(R6에 해당) → 검토_보통 초록\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "보통_검토",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 보통, 검토 필요 예 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 보통\nrule_review: 예\nrule_route: 등급_가르기_1 초록 → 등급_가르기_2 빨강(R6에 해당) → 검토_보통 빨강(N1·N2 중 하나에 해당)\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "없음_확정",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 없음, 검토 필요 아니오 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 없음\nrule_review: 아니오\nrule_route: 등급_가르기_1 초록 → 등급_가르기_2 초록(R1~R6에 해당 없음, R7) → 검토_없음 초록\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        },
+        {
+          "name": "없음_검토",
+          "modelName": "",
+          "prompt": "[역할] 너는 Validate 규칙이 정한 판정을 다음 노드로 넘기는 담당자다.\n[입력] 앞 노드 부류_정리의 응답. 이 노드는 Validate 규칙이 등급 없음, 검토 필요 예 갈래로 보낸 문서만 받는다.\n[출력] 첫 세 줄은 아래 글을 글자 그대로 쓴다.\nrule_grade: 없음\nrule_review: 예\nrule_route: 등급_가르기_1 초록 → 등급_가르기_2 초록(R1~R6에 해당 없음, R7) → 검토_없음 빨강(N1·N2 중 하나에 해당)\n넷째 줄부터는 앞 노드 응답의 rows 줄부터 business_account 줄까지를 한 글자도 바꾸지 않고 그대로 옮겨 쓴다. 다른 말은 덧붙이지 않는다."
+        }
+      ],
+      "connectionMapping": {
+        "부류_정리": {
+          "targetType": "extract",
+          "schemaName": "민감항목_추출"
+        },
+        "위험도_판정": {
+          "targetType": "instruct",
+          "instructNodeName": "없음_검토"
+        }
+      }
+    },
+    "pipelineEdges": [
+      {
+        "id": "e0",
+        "source": {
+          "nodeType": "parse"
+        },
+        "target": {
+          "nodeType": "extract",
+          "name": "민감항목_추출"
+        }
+      },
+      {
+        "id": "e1",
+        "source": {
+          "nodeType": "extract",
+          "name": "민감항목_추출"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "부류_정리"
+        }
+      },
+      {
+        "id": "e2",
+        "source": {
+          "nodeType": "instruct",
+          "name": "부류_정리"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "등급_가르기_1"
+        }
+      },
+      {
+        "id": "e3",
+        "source": {
+          "nodeType": "validate",
+          "name": "등급_가르기_1"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "검토_매우높음"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e4",
+        "source": {
+          "nodeType": "validate",
+          "name": "등급_가르기_1"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "검토_높음"
+        },
+        "condition": {
+          "conditionName": "yellow"
+        }
+      },
+      {
+        "id": "e5",
+        "source": {
+          "nodeType": "validate",
+          "name": "등급_가르기_1"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "등급_가르기_2"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e6",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_매우높음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "매우높음_확정"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e7",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_매우높음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "매우높음_검토"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e8",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_높음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "높음_확정"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e9",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_높음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "높음_검토"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e10",
+        "source": {
+          "nodeType": "validate",
+          "name": "등급_가르기_2"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "검토_보통"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e11",
+        "source": {
+          "nodeType": "validate",
+          "name": "등급_가르기_2"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "검토_없음"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e12",
+        "source": {
+          "nodeType": "instruct",
+          "name": "매우높음_확정"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e13",
+        "source": {
+          "nodeType": "instruct",
+          "name": "매우높음_검토"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e14",
+        "source": {
+          "nodeType": "instruct",
+          "name": "높음_확정"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e15",
+        "source": {
+          "nodeType": "instruct",
+          "name": "높음_검토"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e16",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_보통"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "보통_확정"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e17",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_보통"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "보통_검토"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e18",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_없음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "없음_확정"
+        },
+        "condition": {
+          "conditionName": "green"
+        }
+      },
+      {
+        "id": "e19",
+        "source": {
+          "nodeType": "validate",
+          "name": "검토_없음"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "없음_검토"
+        },
+        "condition": {
+          "conditionName": "red"
+        }
+      },
+      {
+        "id": "e20",
+        "source": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "판정_검사"
+        },
+        "condition": {
+          "conditionName": "매우 높음"
+        }
+      },
+      {
+        "id": "e21",
+        "source": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "판정_검사"
+        },
+        "condition": {
+          "conditionName": "높음"
+        }
+      },
+      {
+        "id": "e22",
+        "source": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "판정_검사"
+        },
+        "condition": {
+          "conditionName": "보통"
+        }
+      },
+      {
+        "id": "e23",
+        "source": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        },
+        "target": {
+          "nodeType": "validate",
+          "name": "판정_검사"
+        },
+        "condition": {
+          "conditionName": "없음"
+        }
+      },
+      {
+        "id": "e24",
+        "source": {
+          "nodeType": "instruct",
+          "name": "보통_확정"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e25",
+        "source": {
+          "nodeType": "instruct",
+          "name": "보통_검토"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e26",
+        "source": {
+          "nodeType": "instruct",
+          "name": "없음_확정"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      },
+      {
+        "id": "e27",
+        "source": {
+          "nodeType": "instruct",
+          "name": "없음_검토"
+        },
+        "target": {
+          "nodeType": "instruct",
+          "name": "위험도_판정"
+        }
+      }
+    ],
+    "validateChecksByName": {
+      "등급_가르기_1": [
+        {
+          "name": "R1_E_없음",
+          "severity": "error",
+          "condition": {
+            "left": {
+              "nodeType": "instruct",
+              "nodeName": "부류_정리",
+              "field": "content"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*class_E:[ \\t]*[^\\s없【])[\\s\\S]*"
+            }
+          }
+        },
+        {
+          "name": "R2_C와_식별_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_C:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "R3_F와_D와_식별_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_D:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "R4_F_없음",
+          "severity": "warning",
+          "condition": {
+            "left": {
+              "nodeType": "instruct",
+              "nodeName": "부류_정리",
+              "field": "content"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+            }
+          }
+        },
+        {
+          "name": "R5_D와_식별_아님",
+          "severity": "warning",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_D:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "검토_매우높음": [
+        {
+          "name": "N2_형식오류_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "and",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*format_check:[ \\t]*없음[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "values",
+                  "rowField": "value",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(?:(?<![\\d-])\\d{6}\\s*-\\s*(?:\\d{1,6}|\\d{8,})(?![\\d\\-*●○#XxＸ])|(?<![\\d-])\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*(?:\\d{1,2}|\\d{5,})(?![\\d\\-*●○#XxＸ])))[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "검토_높음": [
+        {
+          "name": "N2_형식오류_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "and",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*format_check:[ \\t]*없음[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "values",
+                  "rowField": "value",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(?:(?<![\\d-])\\d{6}\\s*-\\s*(?:\\d{1,6}|\\d{8,})(?![\\d\\-*●○#XxＸ])|(?<![\\d-])\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*(?:\\d{1,2}|\\d{5,})(?![\\d\\-*●○#XxＸ])))[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_E후보_없음",
+          "severity": "error",
+          "condition": {
+            "left": {
+              "nodeType": "extract",
+              "nodeName": "민감항목_추출",
+              "field": "obscured",
+              "rowField": "candidate_tags",
+              "scope": "all"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*(주민등록번호|외국인등록번호|여권번호|운전면허번호|국내거소신고번호|비밀번호|인증서|이용자번호|카드보안코드|카드번호))[\\s\\S]*"
+            }
+          }
+        },
+        {
+          "name": "N1_가린칸_C후보면_식별_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(건강|사상·신념|노동조합·정당|정치적 견해|성생활|유전정보|범죄경력|생체특징정보|인종·민족))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_F후보면_D와_식별_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(계좌번호))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_D:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_D후보면_F와_식별_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(거래내용|신용도|신용거래능력|기타 신용판단정보))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_A후보면_C_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(성명|주소|전화번호|이메일))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_C:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_A후보면_F와_D_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(성명|주소|전화번호|이메일))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_D:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_B후보면_C_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(생년월일|성별|직업·직장|학력|혼인 여부|가족관계|신체정보|취미|그 밖의 개인정보))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?:(?![\\s\\S]*class_B:[ \\t]*[^\\s없【])|(?=[\\s\\S]*class_B:[^\\n【,]*,))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_C:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_B후보면_F와_D_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(생년월일|성별|직업·직장|학력|혼인 여부|가족관계|신체정보|취미|그 밖의 개인정보))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?:(?![\\s\\S]*class_B:[ \\t]*[^\\s없【])|(?=[\\s\\S]*class_B:[^\\n【,]*,))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_D:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "등급_가르기_2": [
+        {
+          "name": "R6_식별_아님",
+          "severity": "error",
+          "condition": {
+            "left": {
+              "nodeType": "instruct",
+              "nodeName": "부류_정리",
+              "field": "content"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*class_A:[ \\t]*[^\\s없【])(?![\\s\\S]*class_B:[^\\n【,]*,)[\\s\\S]*"
+            }
+          }
+        }
+      ],
+      "검토_보통": [
+        {
+          "name": "N2_형식오류_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "and",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*format_check:[ \\t]*없음[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "values",
+                  "rowField": "value",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(?:(?<![\\d-])\\d{6}\\s*-\\s*(?:\\d{1,6}|\\d{8,})(?![\\d\\-*●○#XxＸ])|(?<![\\d-])\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*(?:\\d{1,2}|\\d{5,})(?![\\d\\-*●○#XxＸ])))[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_EFCD후보_없음",
+          "severity": "error",
+          "condition": {
+            "left": {
+              "nodeType": "extract",
+              "nodeName": "민감항목_추출",
+              "field": "obscured",
+              "rowField": "candidate_tags",
+              "scope": "all"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*(주민등록번호|외국인등록번호|여권번호|운전면허번호|국내거소신고번호|비밀번호|인증서|이용자번호|카드보안코드|카드번호|계좌번호|건강|사상·신념|노동조합·정당|정치적 견해|성생활|유전정보|범죄경력|생체특징정보|인종·민족|거래내용|신용도|신용거래능력|기타 신용판단정보))[\\s\\S]*"
+            }
+          }
+        }
+      ],
+      "검토_없음": [
+        {
+          "name": "N2_형식오류_없음",
+          "severity": "error",
+          "condition": {
+            "logic": "and",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*format_check:[ \\t]*없음[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "values",
+                  "rowField": "value",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(?:(?<![\\d-])\\d{6}\\s*-\\s*(?:\\d{1,6}|\\d{8,})(?![\\d\\-*●○#XxＸ])|(?<![\\d-])\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*\\d{4}\\s*-\\s*(?:\\d{1,2}|\\d{5,})(?![\\d\\-*●○#XxＸ])))[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "N1_가린칸_EFA후보_없음",
+          "severity": "error",
+          "condition": {
+            "left": {
+              "nodeType": "extract",
+              "nodeName": "민감항목_추출",
+              "field": "obscured",
+              "rowField": "candidate_tags",
+              "scope": "all"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*(주민등록번호|외국인등록번호|여권번호|운전면허번호|국내거소신고번호|비밀번호|인증서|이용자번호|카드보안코드|카드번호|계좌번호|성명|주소|전화번호|이메일))[\\s\\S]*"
+            }
+          }
+        },
+        {
+          "name": "N1_가린칸_B후보면_B가_하나_아님",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "obscured",
+                  "rowField": "candidate_tags",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*(생년월일|성별|직업·직장|학력|혼인 여부|가족관계|신체정보|취미|그 밖의 개인정보))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "부류_정리",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?:(?![\\s\\S]*class_B:[ \\t]*[^\\s없【])|(?=[\\s\\S]*class_B:[^\\n【,]*,))[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "판정_검사": [
+        {
+          "name": "등급을_그대로_옮김",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_grade:[ \\t]*매우 높음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*매우 높음[\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_grade:[ \\t]*높음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*높음[\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_grade:[ \\t]*보통[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*보통[\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_grade:[ \\t]*없음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*없음[\\s\\S]*"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "검토필요를_그대로_옮김",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_review:[ \\t]*예[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*needs_review:[ \\t]*예[\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*rule_review:[ \\t]*아니오[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*needs_review:[ \\t]*아니오[\\s\\S]*"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "규칙번호가_등급과_맞음",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*매우 높음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*applied_rule:[ \\t]*R[123][\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*높음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*applied_rule:[ \\t]*R[45][\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*보통[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*applied_rule:[ \\t]*R[6][\\s\\S]*"
+                    }
+                  }
+                ]
+              },
+              {
+                "logic": "and",
+                "conditions": [
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*risk_grade:[ \\t]*없음[\\s\\S]*"
+                    }
+                  },
+                  {
+                    "left": {
+                      "nodeType": "instruct",
+                      "nodeName": "위험도_판정",
+                      "field": "content"
+                    },
+                    "operator": "matches",
+                    "right": {
+                      "const": "[\\s\\S]*applied_rule:[ \\t]*R[7][\\s\\S]*"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "검토필요면_이유있음",
+          "severity": "error",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*needs_review:[ \\t]*아니오[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*review_reason:[ \\t]*[^\\s【][\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "부류줄_구분은_쉼표만",
+          "severity": "warning",
+          "condition": {
+            "left": {
+              "nodeType": "instruct",
+              "nodeName": "위험도_판정",
+              "field": "content"
+            },
+            "operator": "matches",
+            "right": {
+              "const": "(?![\\s\\S]*class_[A-F]:[^\\n【]*[;/])[\\s\\S]*"
+            }
+          }
+        },
+        {
+          "name": "기호로_가린_계좌번호가_F에_남음",
+          "severity": "warning",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*masked_rows:(?![^\\n]*계좌번호)[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "기호로_가린_주민번호가_E에_남음",
+          "severity": "warning",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*masked_rows:(?![^\\n]*(주민등록번호|외국인등록번호|국내거소신고번호))[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?![\\s\\S]*class_E:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "추출된_계좌번호가_부류에_있음",
+          "severity": "warning",
+          "condition": {
+            "logic": "or",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "extract",
+                  "nodeName": "민감항목_추출",
+                  "field": "values",
+                  "rowField": "tag",
+                  "scope": "all"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?!계좌번호$)[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "(?=[\\s\\S]*class_F:[ \\t]*[^\\s없【])[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*business_account:[ \\t]*있음[\\s\\S]*"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*masked_rows:[^\\n]*계좌번호[\\s\\S]*"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "부류줄_태그가_제_부류",
+          "severity": "warning",
+          "condition": {
+            "logic": "and",
+            "conditions": [
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*class_E:[ \\t]*(?:없음|(?:주민등록번호|외국인등록번호|여권번호|운전면허번호|국내거소신고번호|비밀번호|인증서|이용자번호|카드보안코드|카드번호)(?:,[ \\t]*(?:주민등록번호|외국인등록번호|여권번호|운전면허번호|국내거소신고번호|비밀번호|인증서|이용자번호|카드보안코드|카드번호))*)[ \\t]*(?:【[^】\\n]*】[ \\t]*)*(?:\\n[\\s\\S]*)?"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*class_F:[ \\t]*(?:없음|(?:계좌번호)(?:,[ \\t]*(?:계좌번호))*)[ \\t]*(?:【[^】\\n]*】[ \\t]*)*(?:\\n[\\s\\S]*)?"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*class_C:[ \\t]*(?:없음|(?:건강|사상·신념|노동조합·정당|정치적 견해|성생활|유전정보|범죄경력|생체특징정보|인종·민족)(?:,[ \\t]*(?:건강|사상·신념|노동조합·정당|정치적 견해|성생활|유전정보|범죄경력|생체특징정보|인종·민족))*)[ \\t]*(?:【[^】\\n]*】[ \\t]*)*(?:\\n[\\s\\S]*)?"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*class_D:[ \\t]*(?:없음|(?:거래내용|신용도|신용거래능력|기타 신용판단정보)(?:,[ \\t]*(?:거래내용|신용도|신용거래능력|기타 신용판단정보))*)[ \\t]*(?:【[^】\\n]*】[ \\t]*)*(?:\\n[\\s\\S]*)?"
+                }
+              },
+              {
+                "left": {
+                  "nodeType": "instruct",
+                  "nodeName": "위험도_판정",
+                  "field": "content"
+                },
+                "operator": "matches",
+                "right": {
+                  "const": "[\\s\\S]*class_A:[ \\t]*(?:없음|(?:성명|주소|전화번호|이메일)(?:,[ \\t]*(?:성명|주소|전화번호|이메일))*)[ \\t]*(?:【[^】\\n]*】[ \\t]*)*(?:\\n[\\s\\S]*)?"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "validateSummaryPromptByName": {
+      "판정_검사": "한국어로 쓴다. 실패한 규칙마다 위험도_판정의 어느 줄이 갈래 결과(rule_grade, rule_review)나 부류 줄과 어긋나는지 한 문장으로 적고, 담당자가 원본을 다시 확인해야 한다고 적는다."
+    }
+  }
+}
